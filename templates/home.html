@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block extra_css %}
+  .upload-zone {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem;
+  }
+  .upload-zone .icon-wrap {
+    width: 72px; height: 72px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1.2rem;
+    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.25);
+  }
+  .upload-zone .icon-wrap i { font-size: 1.8rem; color: #fff; }
+  .upload-zone h2 {
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: -0.5px;
+    margin-bottom: 0.4rem;
+  }
+  .upload-zone p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 1.8rem;
+  }
+  .custom-file-input {
+    background: rgba(255,255,255,0.04);
+    border: 1px dashed rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 1.2rem;
+    color: var(--text-secondary);
+    transition: border-color 0.3s ease, background 0.3s ease;
+    cursor: pointer;
+  }
+  .custom-file-input:hover,
+  .custom-file-input:focus {
+    border-color: var(--accent-blue);
+    background: rgba(99, 102, 241, 0.05);
+    color: var(--text-primary);
+  }
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-center" style="min-height: 70vh;">
+  <div class="glass upload-zone text-center fade-up">
+    <div class="icon-wrap">
+      <i class="bi bi-cloud-arrow-up"></i>
+    </div>
+    <h2>Unggah Citra Digital</h2>
+    <p>Upload gambar untuk analisis array RGB menggunakan OpenCV &amp; NumPy</p>
+    <form action="/upload/" enctype="multipart/form-data" method="post">
+      <div class="mb-4">
+        <input
+          name="file"
+          type="file"
+          accept="image/*"
+          class="form-control custom-file-input"
+          required
+        />
+      </div>
+      <button type="submit" class="btn btn-glow w-100">
+        <i class="bi bi-arrow-up-circle me-2"></i>Analisis Gambar
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

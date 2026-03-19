@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+{% block title %}Display Array RGB{% endblock %}
+
+{% block extra_css %}
+  /* Image preview */
+  .img-preview-wrap {
+    position: relative;
+    display: inline-block;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border-glass);
+  }
+  .img-preview-wrap img {
+    max-height: 360px;
+    display: block;
+  }
+  .img-preview-wrap::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.3);
+    pointer-events: none;
+  }
+
+  /* Stat cards row */
+  .stat-card {
+    padding: 1.2rem;
+    text-align: center;
+  }
+  .stat-card .stat-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 0.7rem;
+  }
+  .stat-card .stat-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+  }
+  .stat-card .stat-value {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  /* Color swatch */
+  .color-swatch {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    border: 2px solid rgba(255,255,255,0.15);
+    display: inline-block;
+    vertical-align: middle;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  }
+
+  /* RGB channel cards */
+  .channel-card .channel-header {
+    padding: 0.7rem 1rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.3px;
+    border-bottom: 1px solid var(--border-glass);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .channel-header .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .channel-card pre {
+    margin: 0;
+    padding: 0.8rem 1rem;
+    max-height: 260px;
+    overflow: auto;
+    font-size: 0.7rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    background: transparent;
+  }
+
+  /* Info table */
+  .info-table { width: 100%; }
+  .info-table td, .info-table th {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-glass);
+    font-size: 0.88rem;
+  }
+  .info-table tr:last-child td,
+  .info-table tr:last-child th { border-bottom: none; }
+  .info-table th {
+    color: var(--text-secondary);
+    font-weight: 500;
+    width: 40%;
+  }
+  .info-table td { font-weight: 600; }
+{% endblock %}
+
+{% block content %}
+
+<!-- Header -->
+<div class="text-center mb-4 fade-up">
+  <h2 class="section-title">
+    <i class="bi bi-bar-chart-line me-2" style="color: var(--accent-cyan);"></i>
+    Hasil Analisis Gambar
+  </h2>
+  <p class="text-secondary mb-0" style="font-size:0.9rem;">Pemrosesan citra digital menggunakan OpenCV &amp; NumPy</p>
+</div>
+
+<!-- Image Preview -->
+<div class="text-center mb-4 fade-up">
+  <div class="img-preview-wrap">
+    <img src="{{ image_path }}" alt="Uploaded" class="img-fluid" />
+  </div>
+</div>
+
+<!-- Stat Cards Row -->
+<div class="row g-3 mb-4 fade-up">
+  <!-- Resolusi -->
+  <div class="col-6 col-md-3">
+    <div class="glass stat-card">
+      <div class="stat-icon" style="background: rgba(99,102,241,0.15); color: var(--accent-blue);">
+        <i class="bi bi-aspect-ratio"></i>
+      </div>
+      <div class="stat-label">Resolusi</div>
+      <div class="stat-value">{{ resolution }}</div>
+    </div>
+  </div>
+  <!-- Ukuran File -->
+  <div class="col-6 col-md-3">
+    <div class="glass stat-card">
+      <div class="stat-icon" style="background: rgba(168,85,247,0.15); color: var(--accent-purple);">
+        <i class="bi bi-file-earmark"></i>
+      </div>
+      <div class="stat-label">Ukuran File</div>
+      <div class="stat-value">{{ file_size_kb }} KB</div>
+    </div>
+  </div>
+  <!-- Rata-rata RGB -->
+  <div class="col-6 col-md-3">
+    <div class="glass stat-card">
+      <div class="stat-icon" style="background: rgba(34,211,238,0.15); color: var(--accent-cyan);">
+        <i class="bi bi-palette"></i>
+      </div>
+      <div class="stat-label">Rata-rata RGB</div>
+      <div class="stat-value d-flex align-items-center justify-content-center gap-2">
+        <span class="color-swatch" style="background-color: rgb({{ avg_color['R']|int }},{{ avg_color['G']|int }},{{ avg_color['B']|int }});"></span>
+        <span style="font-size:0.8rem;">{{ avg_color['R'] }}, {{ avg_color['G'] }}, {{ avg_color['B'] }}</span>
+      </div>
+    </div>
+  </div>
+  <!-- Warna Dominan -->
+  <div class="col-6 col-md-3">
+    <div class="glass stat-card">
+      <div class="stat-icon" style="background: rgba(251,146,60,0.15); color: #fb923c;">
+        <i class="bi bi-eyedropper"></i>
+      </div>
+      <div class="stat-label">Warna Dominan</div>
+      <div class="stat-value d-flex align-items-center justify-content-center gap-2">
+        <span class="color-swatch" style="background-color: rgb({{ dominant_color['R'] }},{{ dominant_color['G'] }},{{ dominant_color['B'] }});"></span>
+        <span style="font-size:0.8rem;">{{ dominant_color['R'] }}, {{ dominant_color['G'] }}, {{ dominant_color['B'] }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RGB Channel Arrays -->
+<div class="mb-3 fade-up">
+  <h5 class="section-title text-center">
+    Array RGB <span class="badge-pill">Truncated</span>
+  </h5>
+</div>
+<div class="row g-3 mb-4 fade-up">
+  <!-- Red -->
+  <div class="col-md-4">
+    <div class="glass channel-card">
+      <div class="channel-header">
+        <span class="dot" style="background:#ef4444;"></span> Red Channel
+      </div>
+      <pre>{% for row in rgb_array['R'] %}{{ row }}
+{% endfor %}</pre>
+    </div>
+  </div>
+  <!-- Green -->
+  <div class="col-md-4">
+    <div class="glass channel-card">
+      <div class="channel-header">
+        <span class="dot" style="background:#22c55e;"></span> Green Channel
+      </div>
+      <pre>{% for row in rgb_array['G'] %}{{ row }}
+{% endfor %}</pre>
+    </div>
+  </div>
+  <!-- Blue -->
+  <div class="col-md-4">
+    <div class="glass channel-card">
+      <div class="channel-header">
+        <span class="dot" style="background:#3b82f6;"></span> Blue Channel
+      </div>
+      <pre>{% for row in rgb_array['B'] %}{{ row }}
+{% endfor %}</pre>
+    </div>
+  </div>
+</div>
+
+<!-- Back Button -->
+<div class="text-center mt-2 mb-5 fade-up">
+  <a href="/" class="btn btn-ghost">
+    <i class="bi bi-arrow-left me-2"></i>Unggah Gambar Lain
+  </a>
+</div>
+
+{% endblock %}
